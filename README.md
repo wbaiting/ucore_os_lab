@@ -1,6 +1,9 @@
 说明
+
 **1、此项目fork自陈渝老师的ucore，添加了自己对于源代码的注释**
+
 **2、注释添加在labcodes_answer目录下，针对每个实验涉及到的内容进行注释**
+
 INTRODUCTION
 ============
 ucore os labs was used as OS Experiments in OS Course Of Dept. of Computer Science & Technology, Tsinghua University.
