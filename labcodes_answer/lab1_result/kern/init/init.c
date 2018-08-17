@@ -16,8 +16,10 @@ static void lab1_switch_test(void);
 void
 kern_init(void){
     extern char edata[], end[];
+	//清空BSS段，BSS段通常是指用来存放程序中未初始化的全局变量和静态变量的一块内存区域
     memset(edata, 0, end - edata);
 
+	//初始化控制台
     cons_init();                // init the console
 
     const char *message = "(THU.CST) os is loading ...";
@@ -25,7 +27,7 @@ kern_init(void){
 
     print_kerninfo();
 
-    grade_backtrace();
+    grade_backtrace(); 			//作业2，函数堆栈，
 
     pmm_init();                 // init physical memory management
 

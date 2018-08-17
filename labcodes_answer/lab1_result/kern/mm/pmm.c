@@ -77,6 +77,8 @@ gdt_init(void) {
     // Setup a TSS so that we can get the right stack when we trap from
     // user to the kernel. But not safe here, it's only a temporary value,
     // it will be set to KSTACKTOP in lab2.
+	// 当特权级发生变化，例如由用户态陷入到内核态，esp和ss要发生变化
+	// 详情查看ucore_os_docs.pdf
     ts.ts_esp0 = (uint32_t)&stack0 + sizeof(stack0);
     ts.ts_ss0 = KERNEL_DS;
 

@@ -7,6 +7,7 @@
 
 #define STACKFRAME_DEPTH 20
 
+//以下四个变量定义于链接文件kernel.lds中
 extern const struct stab __STAB_BEGIN__[];  // beginning of stabs table
 extern const struct stab __STAB_END__[];    // end of stabs table
 extern const char __STABSTR_BEGIN__[];      // beginning of string table
@@ -22,6 +23,7 @@ struct eipdebuginfo {
     int eip_fn_narg;                        // number of function arguments
 };
 
+//二分查找，在stab中查找包含eip的函数名字等信息
 /* *
  * stab_binsearch - according to the input, the initial value of
  * range [*@region_left, *@region_right], find a single stab entry
@@ -318,3 +320,86 @@ print_stackframe(void) {
     }
 }
 
+
+//函数调用可以描述为以下几个步骤：
+//- 1、参数入栈：将参数从右向左依次压入栈中。
+//- 2、返回地址入栈：call指令内部隐含的动作，将call的下一条指令入栈
+//- 3、代码区跳转：跳转到被调用函数入口处
+//- 4、函数入口处前两条指令，为本地编译器自动插入的指令，执行这两条指令
+//- 4.1、将ebp的值入栈，即调用之前的那个栈帧的底部
+//- 4.2、将当前的esp值赋给ebp，当前的esp即为新的函数的栈帧的底部，保存到ebp中
+//- 4.3、给新栈帧分配空间（把ESP减去所需空间的大小）。
+//
+//函数返回的大概步骤：
+//- 1、保存返回值，通常将函数返回值保存到寄存器EAX中。
+//- 2、将当前的ebp赋给esp
+//- 3、从栈中弹出一个值给ebp
+//- 4、弹出返回地址，从返回地址处继续执行
+//
+//就是一个相反的过程。
+//
+//对于函数调用时为什么会有4、3这个步骤，有如下解释：
+//&nbsp深入理解计算机系统一书P154这样描述：“GCC坚持一个x86编程指导方针，也就是一个函数使用的所有栈空间必须是16字节的整数倍。包括保存%ebp值的4个字节和返回值的4个字节，采用这个规则是为了保证访问数据的严格对齐。”
+
+
+//函数堆栈
+// | 栈底方向 		| 高位地址
+// | 。。。  		|
+// | 。。。 		|
+// | 参数3 			|
+// | 参数2 			|
+// | 参数1 		 	|
+// | 返回地址eip 	|
+// | 上一层[ebp] 	|<-------------[ebp]
+// | 局部变量 		|地位地址
+//
+//
+// 作业2的调用过程中，堆栈情况如下所示
+//
+// | 栈底 				| <----0x7c00
+// | 0x7c4f 			| 即将进入bootmain（），此处是bootmain的返回地址，bootasm.s的spin
+// | 0 					| <----0x7bf8
+// | 局部变量 			|
+// | ..... 				|
+// | 0x7d64 			| 即将调用内核init_main，内核调用的返回地址，bootmain.c的outw
+// | 0x7bf8 			| <----0x7be8   //gcc默认以16字节对齐函数堆栈
+// | 局部变量 			|
+// | 。。。。。 		|  //这里存在疑问，为什么这一层的堆栈有48个字节，init_main用了48个字节的堆栈。^puzzle2^
+// |....... 			| 调用grade_backtrace()
+// | 0x100055 			| 此处为返回地址也就是pmm_init的地址
+// | 0x7be8 			| <----0x7bb8
+// | 局部变量 			|
+// | 。。。。。  		|
+// | 参数3 0xffff0000 	|调用grade_backtrace0()
+// | 参数2 0x100000 	|
+// | 参数1 0x0 			|
+// | 0x100103 			|
+// | 0x7bb8 			| <----0x7b98
+// | 局部变量 			|
+// | 。。。。。 		| 调用grade——backtrace1()
+// | 参数2 0xffff0000 	| <----0x7b84
+// | 参数1 0x0 			| <----0x7b80
+// | 0x1000de 			|
+// | 0x7b98 			| <----0x7b78
+// | 局部变量 			|
+// | 。。。。。 		|
+// | 参数4 0x7b84 		|调用grade_backtrace2,准备传参
+// | 参数3 0xffff0000 	|
+// | 参数2 0x7b80 		|
+// | 参数1 0x0 			|
+// | 0x1000c0 			|
+// | 0x7b78 			| <----0x7b58
+// | 局部变量 			|
+// | 。。。。。 		|
+// | 参数3 0x0 			| 调用mon_backtrace()
+// | 参数2 0x0 			|
+// | 参数1 0x0 			|
+// | 0x100097 			|
+// | 0x7b58 			| <----0x7b38
+// | 局部变量			|
+// |。。。。。 			|
+// | 0x100d1b 			| 调用print_stackframe()
+// | 0x7b38 			| <----0x7b28
+// | 局部变量			|
+// | 。。。。。 		|
+//

@@ -1,0 +1,410 @@
+
+bin/kernel:     file format elf32-i386
+
+SYMBOL TABLE:
+00100000 l    d  .text	00000000 .text
+00103600 l    d  .rodata	00000000 .rodata
+00103f0c l    d  .stab	00000000 .stab
+0010b79d l    d  .stabstr	00000000 .stabstr
+0010e000 l    d  .data	00000000 .data
+0010ea20 l    d  .bss	00000000 .bss
+00000000 l    d  .comment	00000000 .comment
+00000000 l    df *ABS*	00000000 init.c
+001001e0 l     F .text	00000039 lab1_switch_test
+00100105 l     F .text	000000c6 lab1_print_cur_status
+0010ea20 l     O .bss	00000004 round.1132
+001001cb l     F .text	0000000c lab1_switch_to_user
+001001d7 l     F .text	00000009 lab1_switch_to_kernel
+00000000 l    df *ABS*	00000000 readline.c
+0010ea40 l     O .bss	00000400 buf
+00000000 l    df *ABS*	00000000 stdio.c
+001002cf l     F .text	00000020 cputch
+00000000 l    df *ABS*	00000000 kdebug.c
+001003c3 l     F .text	00000156 stab_binsearch
+0010098f l     F .text	00000011 read_eip
+00000000 l    df *ABS*	00000000 kmonitor.c
+0010e000 l     O .data	00000024 commands
+00100ad0 l     F .text	000000ba parse
+00100b8a l     F .text	000000b2 runcmd
+00000000 l    df *ABS*	00000000 panic.c
+0010ee40 l     O .bss	00000004 is_panic
+00000000 l    df *ABS*	00000000 clock.c
+00000000 l    df *ABS*	00000000 console.c
+00100e4d l     F .text	00000048 delay
+0010ee60 l     O .bss	00000004 crt_buf
+0010ee64 l     O .bss	00000002 crt_pos
+0010ee66 l     O .bss	00000002 addr_6845
+00100e95 l     F .text	000000e6 cga_init
+0010ee68 l     O .bss	00000004 serial_exists
+00100f7b l     F .text	000000e3 serial_init
+0010105e l     F .text	00000079 lpt_putc_sub
+001010d7 l     F .text	0000003f lpt_putc
+00101116 l     F .text	000001d4 cga_putc
+001012ea l     F .text	00000059 serial_putc_sub
+00101343 l     F .text	0000003f serial_putc
+0010ee80 l     O .bss	00000208 cons
+00101382 l     F .text	0000004b cons_intr
+001013cd l     F .text	00000057 serial_proc_data
+0010e040 l     O .data	00000100 shiftcode
+0010e140 l     O .data	00000100 togglecode
+0010e240 l     O .data	00000100 normalmap
+0010e340 l     O .data	00000100 shiftmap
+0010e440 l     O .data	00000100 ctlmap
+0010e540 l     O .data	00000010 charcode
+00101441 l     F .text	00000189 kbd_proc_data
+0010f088 l     O .bss	00000004 shift.1249
+001015ca l     F .text	00000014 kbd_intr
+001015de l     F .text	00000019 kbd_init
+00000000 l    df *ABS*	00000000 intr.c
+00000000 l    df *ABS*	00000000 picirq.c
+0010e550 l     O .data	00000002 irq_mask
+0010f08c l     O .bss	00000004 did_init
+001016b4 l     F .text	00000058 pic_setmask
+00000000 l    df *ABS*	00000000 trap.c
+00101875 l     F .text	0000001c print_ticks
+0010f0a0 l     O .bss	00000800 idt
+0010e560 l     O .data	00000006 idt_pd
+00101a02 l     F .text	00000031 trapname
+00103cc0 l     O .rodata	00000050 excnames.1273
+0010e580 l     O .data	00000060 IA32flags
+00101cc5 l     F .text	00000212 trap_dispatch
+00000000 l    df *ABS*	00000000 pmm.c
+0010f8a0 l     O .bss	00000068 ts
+0010e9e0 l     O .data	00000030 gdt
+0010ea10 l     O .data	00000006 gdt_pd
+0010297c l     F .text	00000035 lgdt
+001029b1 l     F .text	00000100 gdt_init
+00000000 l    df *ABS*	00000000 printfmt.c
+00103d74 l     O .rodata	0000001c error_string
+00102abb l     F .text	00000105 printnum
+00102bc0 l     F .text	0000004f getuint
+00102c0f l     F .text	00000047 getint
+0010306f l     F .text	00000035 sprintputch
+00000000 l    df *ABS*	00000000 string.c
+00000000 l    df *ABS*	00000000 
+001028d4 g       .text	00000000 vector242
+0010232b g       .text	00000000 vector119
+00100856 g     F .text	00000096 print_kerninfo
+0010220b g       .text	00000000 vector87
+00102202 g       .text	00000000 vector86
+00102940 g       .text	00000000 vector251
+00103194 g     F .text	0000003f strcpy
+0010222f g       .text	00000000 vector91
+00102025 g       .text	00000000 vector33
+00102514 g       .text	00000000 vector162
+00102778 g       .text	00000000 vector213
+001022c8 g       .text	00000000 vector108
+0010207f g       .text	00000000 vector43
+00100d0b g     F .text	00000012 mon_backtrace
+00102538 g       .text	00000000 vector165
+00102628 g       .text	00000000 vector185
+00102307 g       .text	00000000 vector115
+00102346 g       .text	00000000 vector122
+001024cc g       .text	00000000 vector156
+001028f8 g       .text	00000000 vector245
+00102658 g       .text	00000000 vector189
+00101f4b g       .text	00000000 vector7
+00102121 g       .text	00000000 vector61
+00101fd4 g       .text	00000000 vector24
+001022e3 g       .text	00000000 vector111
+001026dc g       .text	00000000 vector200
+00102157 g       .text	00000000 vector67
+001023f4 g       .text	00000000 vector138
+00102196 g       .text	00000000 vector74
+001034aa g     F .text	000000a3 memmove
+001020fd g       .text	00000000 vector57
+001030a4 g     F .text	00000034 snprintf
+00101a49 g     F .text	000001c5 print_trapframe
+00102784 g       .text	00000000 vector214
+00102c84 g     F .text	000003eb vprintfmt
+00102277 g       .text	00000000 vector99
+00101eea g       .text	00000000 __alltraps
+0010164c g     F .text	0000005c cons_getc
+00102418 g       .text	00000000 vector141
+00100de0 g     F .text	0000000a is_kernel_panic
+0010258c g       .text	00000000 vector172
+001009a0 g     F .text	00000130 print_stackframe
+001028c8 g       .text	00000000 vector241
+00102958 g       .text	00000000 vector253
+00101f27 g       .text	00000000 vector3
+00101f1e g       .text	00000000 vector2
+00102820 g       .text	00000000 vector227
+00102754 g       .text	00000000 vector210
+001027fc g       .text	00000000 vector224
+0010206d g       .text	00000000 vector41
+00100322 g     F .text	00000026 cprintf
+00101fb9 g       .text	00000000 vector21
+001025c8 g       .text	00000000 vector177
+00102322 g       .text	00000000 vector118
+00102172 g       .text	00000000 vector70
+00102169 g       .text	00000000 vector69
+00102898 g       .text	00000000 vector237
+0010213c g       .text	00000000 vector64
+00101fef g       .text	00000000 vector27
+001023ac g       .text	00000000 vector132
+00102634 g       .text	00000000 vector186
+001027a8 g       .text	00000000 vector217
+0010354d g     F .text	0000004f memcpy
+00101f15 g       .text	00000000 vector1
+001025d4 g       .text	00000000 vector178
+00102052 g       .text	00000000 vector38
+001028a4 g       .text	00000000 vector238
+00100219 g     F .text	000000b6 readline
+001023b8 g       .text	00000000 vector133
+0010218d g       .text	00000000 vector73
+0010243c g       .text	00000000 vector144
+00100000 g     F .text	00000075 kern_init
+00102964 g       .text	00000000 vector254
+00102289 g       .text	00000000 vector101
+00102760 g       .text	00000000 vector211
+001025a4 g       .text	00000000 vector174
+001028e0 g       .text	00000000 vector243
+0010237c g       .text	00000000 vector128
+001021d5 g       .text	00000000 vector81
+00101f77 g       .text	00000000 vector13
+001030d8 g     F .text	00000064 vsnprintf
+001020c7 g       .text	00000000 vector51
+00101f8e g       .text	00000000 vector16
+0010ea16 g       .data	00000000 edata
+001015f7 g     F .text	0000002c cons_init
+001028bc g       .text	00000000 vector240
+001020e2 g       .text	00000000 vector54
+00101fa7 g       .text	00000000 vector19
+0010b79c g       .stab	00000000 __STAB_END__
+00102238 g       .text	00000000 vector92
+001028ec g       .text	00000000 vector244
+0010240c g       .text	00000000 vector140
+00102091 g       .text	00000000 vector45
+001021c3 g       .text	00000000 vector79
+00102838 g       .text	00000000 vector229
+001024e4 g       .text	00000000 vector158
+0010170c g     F .text	0000002e pic_enable
+0010205b g       .text	00000000 vector39
+0010255c g       .text	00000000 vector168
+00102037 g       .text	00000000 vector35
+001022f5 g       .text	00000000 vector113
+0010b79d g       .stabstr	00000000 __STABSTR_BEGIN__
+00102361 g       .text	00000000 vector125
+00100d1d g     F .text	0000007d __panic
+0010279c g       .text	00000000 vector216
+00102133 g       .text	00000000 vector63
+00101fe6 g       .text	00000000 vector26
+00101424 g     F .text	0000001d serial_intr
+00102688 g       .text	00000000 vector193
+001026ac g       .text	00000000 vector196
+001000c6 g     F .text	0000001a grade_backtrace0
+00102748 g       .text	00000000 vector209
+00101f30 g       .text	00000000 vector4
+00102574 g       .text	00000000 vector170
+001023dc g       .text	00000000 vector136
+00101f62 g       .text	00000000 vector10
+00102724 g       .text	00000000 vector206
+0010f980 g     O .bss	00000400 stack0
+00102970 g       .text	00000000 vector255
+001025f8 g       .text	00000000 vector181
+0010210f g       .text	00000000 vector59
+001000e0 g     F .text	00000025 grade_backtrace
+001021f9 g       .text	00000000 vector85
+001021f0 g       .text	00000000 vector84
+00102610 g       .text	00000000 vector183
+001024f0 g       .text	00000000 vector159
+0010276c g       .text	00000000 vector212
+001020a3 g       .text	00000000 vector47
+0010330d g     F .text	0000015e strtol
+0010282c g       .text	00000000 vector228
+00102076 g       .text	00000000 vector42
+001022fe g       .text	00000000 vector114
+00103164 g     F .text	00000030 strnlen
+001025b0 g       .text	00000000 vector175
+00102430 g       .text	00000000 vector143
+00102394 g       .text	00000000 vector130
+00102904 g       .text	00000000 vector246
+00101f5b g       .text	00000000 vector9
+00102424 g       .text	00000000 vector142
+00102280 g       .text	00000000 vector100
+001026e8 g       .text	00000000 vector201
+00101891 g     F .text	00000171 idt_init
+001008ec g     F .text	000000a3 print_debuginfo
+00102118 g       .text	00000000 vector60
+00101fcb g       .text	00000000 vector23
+0010288c g       .text	00000000 vector236
+00102850 g       .text	00000000 vector231
+0010214e g       .text	00000000 vector66
+00102001 g       .text	00000000 vector29
+001023d0 g       .text	00000000 vector135
+00100c3c g     F .text	00000060 kmonitor
+001021b1 g       .text	00000000 vector77
+001025ec g       .text	00000000 vector180
+00100dea g     F .text	00000063 clock_init
+0010273c g       .text	00000000 vector208
+0010226e g       .text	00000000 vector98
+00102265 g       .text	00000000 vector97
+001025bc g       .text	00000000 vector176
+00102694 g       .text	00000000 vector194
+0010201c g       .text	00000000 vector32
+0010fd80 g       .bss	00000000 end
+001026d0 g       .text	00000000 vector199
+001023a0 g       .text	00000000 vector131
+0010294c g       .text	00000000 vector252
+00101f0c g       .text	00000000 vector0
+001032df g     F .text	0000002e strfind
+00101623 g     F .text	00000029 cons_putc
+001035f4 g       .text	00000000 etext
+00102448 g       .text	00000000 vector145
+001022bf g       .text	00000000 vector107
+00102064 g       .text	00000000 vector40
+001016a8 g     F .text	00000006 intr_enable
+00102292 g       .text	00000000 vector102
+001020f4 g       .text	00000000 vector56
+00102160 g       .text	00000000 vector68
+00101f42 g       .text	00000000 vector6
+00102388 g       .text	00000000 vector129
+001026b8 g       .text	00000000 vector197
+0010249c g       .text	00000000 vector152
+0010e5e0 g       .data	00000000 __vectors
+00102844 g       .text	00000000 vector230
+00103256 g     F .text	00000056 strncmp
+00102049 g       .text	00000000 vector37
+00102718 g       .text	00000000 vector205
+00102508 g       .text	00000000 vector161
+001031d3 g     F .text	0000003a strncpy
+0010217b g       .text	00000000 vector71
+001024fc g       .text	00000000 vector160
+00102790 g       .text	00000000 vector215
+001024d8 g       .text	00000000 vector157
+001016ae g     F .text	00000006 intr_disable
+00101c0e g     F .text	000000b7 print_regs
+001022ec g       .text	00000000 vector112
+00100075 g     F .text	00000024 grade_backtrace2
+00102604 g       .text	00000000 vector182
+00101f70 g       .text	00000000 vector12
+0010359c g     F .text	00000058 memcmp
+001022d1 g       .text	00000000 vector109
+00101fb0 g       .text	00000000 vector20
+001020d9 g       .text	00000000 vector53
+00101f9e g       .text	00000000 vector18
+00102253 g       .text	00000000 vector95
+00102814 g       .text	00000000 vector226
+001020b5 g       .text	00000000 vector49
+00102088 g       .text	00000000 vector44
+001021ba g       .text	00000000 vector78
+00102598 g       .text	00000000 vector173
+00102319 g       .text	00000000 vector117
+00101a33 g     F .text	00000016 trap_in_kernel
+001021de g       .text	00000000 vector82
+001027e4 g       .text	00000000 vector222
+00101f54 g       .text	00000000 vector8
+00102478 g       .text	00000000 vector149
+00100348 g     F .text	00000013 cputchar
+0010346b g     F .text	0000003f memset
+0010285c g       .text	00000000 vector232
+001022b6 g       .text	00000000 vector106
+001027cc g       .text	00000000 vector220
+00102226 g       .text	00000000 vector90
+00102520 g       .text	00000000 vector163
+00102874 g       .text	00000000 vector234
+0010212a g       .text	00000000 vector62
+00101fdd g       .text	00000000 vector25
+001026c4 g       .text	00000000 vector198
+00102334 g       .text	00000000 vector120
+001003aa g     F .text	00000019 getchar
+001020be g       .text	00000000 vector50
+00101f85 g       .text	00000000 vector15
+00102c56 g     F .text	0000002e printfmt
+00102490 g       .text	00000000 vector151
+001021e7 g       .text	00000000 vector83
+0010221d g       .text	00000000 vector89
+00102214 g       .text	00000000 vector88
+00101ed7 g     F .text	00000013 trap
+001025e0 g       .text	00000000 vector179
+0010202e g       .text	00000000 vector34
+0010d7b8 g       .stabstr	00000000 __STABSTR_END__
+0010209a g       .text	00000000 vector46
+0010320d g     F .text	00000049 strcmp
+001023c4 g       .text	00000000 vector134
+001027f0 g       .text	00000000 vector223
+001027b4 g       .text	00000000 vector218
+00100519 g     F .text	0000033d debuginfo_eip
+0010173a g     F .text	0000013b pic_init
+00102808 g       .text	00000000 vector225
+00102640 g       .text	00000000 vector187
+00102ab1 g     F .text	0000000a pmm_init
+0010200a g       .text	00000000 vector30
+00102373 g       .text	00000000 vector127
+0010f908 g     O .bss	00000004 ticks
+0010267c g       .text	00000000 vector192
+00102544 g       .text	00000000 vector166
+001021a8 g       .text	00000000 vector76
+0010219f g       .text	00000000 vector75
+001026a0 g       .text	00000000 vector195
+00102484 g       .text	00000000 vector150
+00102106 g       .text	00000000 vector58
+0010291c g       .text	00000000 vector248
+0010234f g       .text	00000000 vector123
+0010225c g       .text	00000000 vector96
+00102013 g       .text	00000000 vector31
+00102700 g       .text	00000000 vector203
+00102400 g       .text	00000000 vector139
+001024a8 g       .text	00000000 vector153
+0010252c g       .text	00000000 vector164
+0010233d g       .text	00000000 vector121
+0010f920 g     O .bss	0000004c switchk2u
+00101f39 g       .text	00000000 vector5
+00102550 g       .text	00000000 vector167
+001024c0 g       .text	00000000 vector155
+00102928 g       .text	00000000 vector249
+00102934 g       .text	00000000 vector250
+00102358 g       .text	00000000 vector124
+001022da g       .text	00000000 vector110
+0010270c g       .text	00000000 vector204
+00101f01 g       .text	00000000 __trapret
+001002ef g     F .text	00000033 vcprintf
+001023e8 g       .text	00000000 vector137
+00100d9a g     F .text	00000046 __warn
+00102910 g       .text	00000000 vector247
+00101fc2 g       .text	00000000 vector22
+001026f4 g       .text	00000000 vector202
+00102184 g       .text	00000000 vector72
+001020eb g       .text	00000000 vector55
+0010035b g     F .text	0000004f cputs
+0010236a g       .text	00000000 vector126
+00102145 g       .text	00000000 vector65
+00101ff8 g       .text	00000000 vector28
+00102568 g       .text	00000000 vector169
+00102868 g       .text	00000000 vector233
+00102460 g       .text	00000000 vector147
+001022a4 g       .text	00000000 vector104
+00102310 g       .text	00000000 vector116
+00103f0c g       .stab	00000000 __STAB_BEGIN__
+001020d0 g       .text	00000000 vector52
+00101f97 g       .text	00000000 vector17
+0010261c g       .text	00000000 vector184
+0010313c g     F .text	00000028 strlen
+00102730 g       .text	00000000 vector207
+00102664 g       .text	00000000 vector190
+001028b0 g       .text	00000000 vector239
+0010224a g       .text	00000000 vector94
+00102241 g       .text	00000000 vector93
+0010264c g       .text	00000000 vector188
+001032ac g     F .text	00000033 strchr
+001020ac g       .text	00000000 vector48
+00100099 g     F .text	0000002d grade_backtrace1
+001027c0 g       .text	00000000 vector219
+0010246c g       .text	00000000 vector148
+001027d8 g       .text	00000000 vector221
+001021cc g       .text	00000000 vector80
+00102580 g       .text	00000000 vector171
+001024b4 g       .text	00000000 vector154
+00102040 g       .text	00000000 vector36
+0010f96c g     O .bss	00000004 switchu2k
+00102880 g       .text	00000000 vector235
+001022ad g       .text	00000000 vector105
+00100cf9 g     F .text	00000012 mon_kerninfo
+00102454 g       .text	00000000 vector146
+00102670 g       .text	00000000 vector191
+0010229b g       .text	00000000 vector103
+00100c9c g     F .text	0000005d mon_help
+00101f69 g       .text	00000000 vector11
+00101f7e g       .text	00000000 vector14
+
+

@@ -46,7 +46,13 @@ idt_init(void) {
       *     You don't know the meaning of this instruction? just google it! and check the libs/x86.h to know more.
       *     Notice: the argument of lidt is idt_pd. try to find it!
       */
+	//初始化中断描述符表
     extern uintptr_t __vectors[];
+	//自动生成的vectors.s中指明了每一个中断号对应的中断向量地址，
+	//可以发现发生中断后，会跳到all_traps中执行
+	//然后将按一定顺序将相应的寄存器入栈,
+	//调用trap接着调用trap_dispatch函数，
+	//在该函数中判断中断号做相应的处理
     int i;
     for (i = 0; i < sizeof(idt) / sizeof(struct gatedesc); i ++) {
         SETGATE(idt[i], 0, GD_KTEXT, __vectors[i], DPL_KERNEL);
@@ -159,6 +165,7 @@ trap_dispatch(struct trapframe *tf) {
          * (2) Every TICK_NUM cycle, you can print some info using a funciton, such as print_ticks().
          * (3) Too Simple? Yes, I think so!
          */
+		//时钟中断
         ticks ++;
         if (ticks % TICK_NUM == 0) {
             print_ticks();
@@ -173,6 +180,8 @@ trap_dispatch(struct trapframe *tf) {
         cprintf("kbd [%03d] %c\n", c, c);
         break;
     //LAB1 CHALLENGE 1 : YOUR CODE you should modify below codes.
+	//以下是软中断，其实就是去改trapframe结构体也就是栈中的相应位置，
+	//从而使出栈的时候，能够给寄存器赋不一样的值，实现跳转
     case T_SWITCH_TOU:
         if (tf->tf_cs != USER_CS) {
             switchk2u = *tf;
