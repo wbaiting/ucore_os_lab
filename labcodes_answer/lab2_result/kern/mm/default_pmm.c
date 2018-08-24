@@ -110,13 +110,13 @@ default_init_memmap(struct Page *base, size_t n) {
     struct Page *p = base;
     for (; p != base + n; p ++) {
         assert(PageReserved(p));
-        p->flags = p->property = 0;
+        p->flags = p->property = 0;//清除flags，清除了bit0中的1
         set_page_ref(p, 0);
     }
-    base->property = n;
+    base->property = n; 	//property表示这一块内存的连续的页数
     SetPageProperty(base);
-    nr_free += n;
-    list_add_before(&free_list, &(base->page_link));
+    nr_free += n; 	//统计总的可分配的页数
+    list_add_before(&free_list, &(base->page_link));//插入到链表头前面,保证了物理块由地址从小到大顺序排列
 }
 
 static struct Page *
@@ -127,15 +127,17 @@ default_alloc_pages(size_t n) {
     }
     struct Page *page = NULL;
     list_entry_t *le = &free_list;
-    // TODO: optimize (next-fit)
+    // TODO: optimize (next-fit)循环首次适应算法
     while ((le = list_next(le)) != &free_list) {
         struct Page *p = le2page(le, page_link);
         if (p->property >= n) {
             page = p;
             break;
         }
-    }
+    } //找到首次大小适应的内存块，转化成页结构体地址
+
     if (page != NULL) {
+			//当内存块的页数大于需要分配的页数，会产生碎片
         if (page->property > n) {
             struct Page *p = page + n;
             p->property = page->property - n;
@@ -144,7 +146,7 @@ default_alloc_pages(size_t n) {
         }
         list_del(&(page->page_link));
         nr_free -= n;
-        ClearPageProperty(page);
+        ClearPageProperty(page);//清除连续页的数目
     }
     return page;
 }
@@ -154,7 +156,7 @@ default_free_pages(struct Page *base, size_t n) {
     assert(n > 0);
     struct Page *p = base;
     for (; p != base + n; p ++) {
-        assert(!PageReserved(p) && !PageProperty(p));
+        assert(!PageReserved(p) && !PageProperty(p));//检查flags
         p->flags = 0;
         set_page_ref(p, 0);
     }
@@ -165,12 +167,12 @@ default_free_pages(struct Page *base, size_t n) {
         p = le2page(le, page_link);
         le = list_next(le);
         // TODO: optimize
-        if (base + base->property == p) {
+        if (base + base->property == p) {//与后面的内存块合并
             base->property += p->property;
             ClearPageProperty(p);
             list_del(&(p->page_link));
         }
-        else if (p + p->property == base) {
+        else if (p + p->property == base) {//与前面的内存块合并
             p->property += base->property;
             ClearPageProperty(base);
             base = p;
@@ -179,7 +181,7 @@ default_free_pages(struct Page *base, size_t n) {
     }
     nr_free += n;
     le = list_next(&free_list);
-    while (le != &free_list) {
+    while (le != &free_list) {//插入到合适的位置
         p = le2page(le, page_link);
         if (base + base->property <= p) {
             assert(base + base->property != p);
@@ -211,7 +213,7 @@ basic_check(void) {
     assert(page2pa(p2) < npage * PGSIZE);
 
     list_entry_t free_list_store = free_list;
-    list_init(&free_list);
+    list_init(&free_list); //清空链表
     assert(list_empty(&free_list));
 
     unsigned int nr_free_store = nr_free;
@@ -248,11 +250,13 @@ basic_check(void) {
 
 // LAB2: below code is used to check the first fit allocation algorithm (your EXERCISE 1) 
 // NOTICE: You SHOULD NOT CHANGE basic_check, default_check functions!
+// 检查分配算法是否实现
 static void
 default_check(void) {
     int count = 0, total = 0;
     list_entry_t *le = &free_list;
     while ((le = list_next(le)) != &free_list) {
+			//检查链表的每一个节点是否成功初始化
         struct Page *p = le2page(le, page_link);
         assert(PageProperty(p));
         count ++, total += p->property;

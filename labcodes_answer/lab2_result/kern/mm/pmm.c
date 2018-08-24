@@ -37,10 +37,10 @@ struct Page *pages;
 size_t npage = 0;
 
 // virtual address of boot-time page directory
-extern pde_t __boot_pgdir;
+extern pde_t __boot_pgdir; 	//就是entry.S中的那个全局变量，他的值是起始地址处存放的值
 pde_t *boot_pgdir = &__boot_pgdir;
 // physical address of boot-time page directory
-uintptr_t boot_cr3;
+uintptr_t boot_cr3; //全局变量，页目录表起始地址，用于加载到cr3中。
 
 // physical memory management
 const struct pmm_manager *pmm_manager;
@@ -189,6 +189,8 @@ nr_free_pages(void) {
 /* pmm_init - initialize the physical memory management */
 static void
 page_init(void) {
+
+		//0x8000在boot/bootasm.S中，存放着探测到的物理地址
     struct e820map *memmap = (struct e820map *)(0x8000 + KERNBASE);
     uint64_t maxpa = 0;
 
@@ -196,28 +198,30 @@ page_init(void) {
     int i;
     for (i = 0; i < memmap->nr_map; i ++) {
         uint64_t begin = memmap->map[i].addr, end = begin + memmap->map[i].size;
+		//打印每一块内存的大小，起始和结束地址，内存类型
         cprintf("  memory: %08llx, [%08llx, %08llx], type = %d.\n",
                 memmap->map[i].size, begin, end - 1, memmap->map[i].type);
         if (memmap->map[i].type == E820_ARM) {
             if (maxpa < end && begin < KMEMSIZE) {
                 maxpa = end;
             }
-        }
+        }//获取最大物理地址
     }
+
     if (maxpa > KMEMSIZE) {
         maxpa = KMEMSIZE;
     }
 
-    extern char end[];
+    extern char end[];//在kerne.lds文件中定义，内核的结尾处的地址，逻辑地址
 
     npage = maxpa / PGSIZE;
-    pages = (struct Page *)ROUNDUP((void *)end, PGSIZE);
+    pages = (struct Page *)ROUNDUP((void *)end, PGSIZE);//pages数组将存放在内核的结尾处
 
     for (i = 0; i < npage; i ++) {
-        SetPageReserved(pages + i);
+        SetPageReserved(pages + i);//先将所有物理页设置为预留不可用
     }
 
-    uintptr_t freemem = PADDR((uintptr_t)pages + sizeof(struct Page) * npage);
+    uintptr_t freemem = PADDR((uintptr_t)pages + sizeof(struct Page) * npage);//表示放置了pages数组后，自由内存的起始地址。pages数组以及之前的地址都不可用，不可用于分配
 
     for (i = 0; i < memmap->nr_map; i ++) {
         uint64_t begin = memmap->map[i].addr, end = begin + memmap->map[i].size;
@@ -229,9 +233,11 @@ page_init(void) {
                 end = KMEMSIZE;
             }
             if (begin < end) {
+					//取整，未对齐的部分不要，不利于分区
                 begin = ROUNDUP(begin, PGSIZE);
                 end = ROUNDDOWN(end, PGSIZE);
                 if (begin < end) {
+						//初始化该小块物理内存对应的页数组
                     init_memmap(pa2page(begin), (end - begin) / PGSIZE);
                 }
             }
@@ -289,24 +295,32 @@ pmm_init(void) {
     page_init();
 
     //use pmm->check to verify the correctness of the alloc/free function in a pmm
+	//检查内存分配
     check_alloc_page();
 
+	//检查页目录表
     check_pgdir();
 
     static_assert(KERNBASE % PTSIZE == 0 && KERNTOP % PTSIZE == 0);
 
     // recursively insert boot_pgdir in itself
     // to form a virtual page table at virtual address VPT
+	// 实现自映射机制，VPT是页目录表中的第一项的虚拟地址，VPD是页目录表的基址虚拟地址
     boot_pgdir[PDX(VPT)] = PADDR(boot_pgdir) | PTE_P | PTE_W;
 
     // map all physical memory to linear memory with base linear addr KERNBASE
     // linear_addr KERNBASE ~ KERNBASE + KMEMSIZE = phy_addr 0 ~ KMEMSIZE
+	// 映射整个物理内存空间，之前只是映射了0-4M的，现在在那个基础上还要映射别的。
+	//cprintf("VPT[0]is0x%0x,VPT[1]is0x%0x\n",vpd[PDX(KERNBASE)],vpd[PDX(KERNBASE)+1]);
+	//注意，这里打印出来的VPT[0]是0x119027，一直纠结2怎么出现的，现在大概清楚了，应该是cpu的页机制在访问这个页时置位的
     boot_map_segment(boot_pgdir, KERNBASE, KMEMSIZE, 0, PTE_W);
+	//cprintf("VPT[0]is0x%0x,VPT[1]is0x%0x\n",vpd[PDX(KERNBASE)],vpd[PDX(KERNBASE)+1]);
 
     // Since we are using bootloader's GDT,
     // we should reload gdt (second time, the last time) to get user segments and the TSS
     // map virtual_addr 0 ~ 4G = linear_addr 0 ~ 4G
     // then set kernel stack (ss:esp) in TSS, setup TSS in gdt, load TSS
+	// 重新设置GDT，
     gdt_init();
 
     //now the basic virtual memory map(see memalyout.h) is established.
@@ -360,14 +374,14 @@ get_pte(pde_t *pgdir, uintptr_t la, bool create) {
     return NULL;          // (8) return page table entry
 #endif
     pde_t *pdep = &pgdir[PDX(la)];
-    if (!(*pdep & PTE_P)) {
+    if (!(*pdep & PTE_P)) {//检查存在位，如果线性地址所对应的页目录表不存在就要分配该目录表
         struct Page *page;
         if (!create || (page = alloc_page()) == NULL) {
             return NULL;
         }
-        set_page_ref(page, 1);
+        set_page_ref(page, 1);//设置引用位
         uintptr_t pa = page2pa(page);
-        memset(KADDR(pa), 0, PGSIZE);
+        memset(KADDR(pa), 0, PGSIZE);//将整个页目录表先清零
         *pdep = pa | PTE_U | PTE_W | PTE_P;
     }
     return &((pte_t *)KADDR(PDE_ADDR(*pdep)))[PTX(la)];
@@ -416,6 +430,7 @@ page_remove_pte(pde_t *pgdir, uintptr_t la, pte_t *ptep) {
                                   //(6) flush tlb
     }
 #endif
+	//reference大于1的意思就是有多个线性地址la都映射到了那个page中，也就是在多个pte中存在page的物理地址
     if (*ptep & PTE_P) {
         struct Page *page = pte2page(*ptep);
         if (page_ref_dec(page) == 0) {
@@ -443,6 +458,7 @@ page_remove(pde_t *pgdir, uintptr_t la) {
 //  perm:  the permission of this Page which is setted in related pte
 // return value: always 0
 //note: PT is changed, so the TLB need to be invalidate 
+//将线性地址映射到页中
 int
 page_insert(pde_t *pgdir, struct Page *page, uintptr_t la, uint32_t perm) {
     pte_t *ptep = get_pte(pgdir, la, 1);
@@ -450,17 +466,17 @@ page_insert(pde_t *pgdir, struct Page *page, uintptr_t la, uint32_t perm) {
         return -E_NO_MEM;
     }
     page_ref_inc(page);
-    if (*ptep & PTE_P) {
+    if (*ptep & PTE_P) {//如果已经存在映射
         struct Page *p = pte2page(*ptep);
-        if (p == page) {
+        if (p == page) {//如果旧映射和新映射一样
             page_ref_dec(page);
         }
-        else {
+        else {//否则删除之前的映射关系
             page_remove_pte(pgdir, la, ptep);
         }
     }
-    *ptep = page2pa(page) | PTE_P | perm;
-    tlb_invalidate(pgdir, la);
+    *ptep = page2pa(page) | PTE_P | perm;//写入新的映射
+    tlb_invalidate(pgdir, la);//因为映射的变化，快表中关于la地址的映射无效化
     return 0;
 }
 
@@ -483,7 +499,8 @@ static void
 check_pgdir(void) {
     assert(npage <= KMEMSIZE / PGSIZE);
     assert(boot_pgdir != NULL && (uint32_t)PGOFF(boot_pgdir) == 0);
-    assert(get_page(boot_pgdir, 0x0, NULL) == NULL);
+    //boot_pgdir[0] has been unmap in entry.S
+    assert(get_page(boot_pgdir, 0x0, NULL) == NULL);//获取线性地址0x0对应的页，boot_pgdir[0] was not allocated
 
     struct Page *p1, *p2;
     p1 = alloc_page();
@@ -520,7 +537,7 @@ check_pgdir(void) {
     assert(page_ref(p1) == 0);
     assert(page_ref(p2) == 0);
 
-    assert(page_ref(pde2page(boot_pgdir[0])) == 1);
+    assert(page_ref(pde2page(boot_pgdir[0])) == 1);//不太明白这个1怎么来的，又清楚了，这个是boot_pgdir[0]的值，
     free_page(pde2page(boot_pgdir[0]));
     boot_pgdir[0] = 0;
 
@@ -542,6 +559,7 @@ check_boot_pgdir(void) {
 
     struct Page *p;
     p = alloc_page();
+	//相当于两个虚拟地址共享了一个页
     assert(page_insert(boot_pgdir, p, 0x100, PTE_W) == 0);
     assert(page_ref(p) == 1);
     assert(page_insert(boot_pgdir, p, 0x100 + PGSIZE, PTE_W) == 0);

@@ -8,7 +8,7 @@
 .set PROT_MODE_CSEG,        0x8                     # kernel code segment selector
 .set PROT_MODE_DSEG,        0x10                    # kernel data segment selector
 .set CR0_PE_ON,             0x1                     # protected mode enable flag
-.set SMAP,                  0x534d4150
+.set SMAP,                  0x534d4150 		#ascii字符“SMAP”,只是一个签名
 
 # start address should be 0:7c00, in real mode, the beginning address of the running bootloader
 .globl start
@@ -43,6 +43,15 @@ seta20.2:
     movb $0xdf, %al                                 # 0xdf -> port 0x60
     outb %al, $0x60
 
+# 物理内存探测，调用15h中断，eax edx ebx ecx es:di，传入参数
+# struct e820map{
+# 		int nr_map;
+# 		struct {
+# 				long long addr;
+# 				long long size;
+# 				long type;
+# 		}map[E820Max];
+# };
 probe_memory:
     movl $0, 0x8000
     xorl %ebx, %ebx
@@ -52,6 +61,8 @@ start_probe:
     movl $20, %ecx
     movl $SMAP, %edx
     int $0x15
+
+# 如果eflags的cf位为0，表示中断执行成功，否则中断不成功
     jnc cont
     movw $12345, 0x8000
     jmp finish_probe
@@ -103,5 +114,7 @@ gdt:
     SEG_ASM(STA_W, 0x0, 0xffffffff)                 # data seg for bootloader and kernel
 
 gdtdesc:
+
+    # 申请word（2字节）的空间，并初始该位置为0x17
     .word 0x17                                      # sizeof(gdt) - 1
     .long gdt                                       # address gdt

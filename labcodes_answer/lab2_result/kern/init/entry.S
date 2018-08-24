@@ -8,7 +8,7 @@
 kern_entry:
     # load pa of boot pgdir
     movl $REALLOC(__boot_pgdir), %eax
-    movl %eax, %cr3
+    movl %eax, %cr3 #存放页目录的物理地址
 
     # enable paging
     movl %cr0, %eax
@@ -18,7 +18,7 @@ kern_entry:
 
     # update eip
     # now, eip = 0x1.....
-    leal next, %eax
+    leal next, %eax #leal指令，用于加载有效地址
     # set eip = KERNBASE + 0x1.....
     jmp *%eax
 next:
@@ -67,3 +67,4 @@ __boot_pt1:
     .long i * PGSIZE + (PTE_P | PTE_W)
     .set i, i + 1
 .endr
+# 自带的注释已明明白白，0-4M 以及KERNBASE+(0~4M)都映射到了物理地址0~4M

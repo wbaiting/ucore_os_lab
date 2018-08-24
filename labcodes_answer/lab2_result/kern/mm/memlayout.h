@@ -96,6 +96,7 @@ struct e820map {
  * physical page. In kern/mm/pmm.h, you can find lots of useful functions
  * that convert Page to other data types, such as phyical address.
  * */
+//目前flags使用了bit0以及bit1这两位，bit0为1表示保留，bit1为1表示free
 struct Page {
     int ref;                        // page frame's reference counter
     uint32_t flags;                 // array of flags that describe the status of the page frame

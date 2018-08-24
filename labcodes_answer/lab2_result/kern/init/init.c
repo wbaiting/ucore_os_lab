@@ -27,6 +27,8 @@ kern_init(void) {
 
     grade_backtrace();
 
+
+	//本次实验所做的操作，在下面的这个函数和相关函数中.
     pmm_init();                 // init physical memory management
 
     pic_init();                 // init interrupt controller
